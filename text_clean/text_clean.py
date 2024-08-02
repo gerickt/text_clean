@@ -6,6 +6,7 @@ import nltk
 from nltk.corpus import stopwords
 import json
 import spacy
+import string
 
 # Descargar el modelo de spaCy
 try:
@@ -52,6 +53,7 @@ def clean_text(text, corrections_dict, stopwords_set):
     text = remove_urls(text)
     text = remove_html_tags(text)
     text = clean_html_entities(text)
+    text = remove_punctuation(text)  # Añadido aquí
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'\d+', '', text)  # Elimina números
     text = text.lower()
@@ -89,3 +91,8 @@ def process_text_column(data, column_name, corrections_dict, stopwords_set):
     data['Text_Clean'] = data[column_name].apply(lambda x: clean_text(
         x, corrections_dict, stopwords_set) if isinstance(x, str) else x)
     return data
+
+def remove_punctuation(text):
+    if not isinstance(text, str):
+        return text
+    return text.translate(str.maketrans('', '', string.punctuation))
