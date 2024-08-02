@@ -17,7 +17,7 @@ Esta es una librería de Python diseñada para facilitar la limpieza de texto en
 Puedes instalar esta librería utilizando pip:
 
 ```
-pip install git+https://github.com/gerickt/text-clean.git   
+pip install git+https://github.com/gerickt/text_clean.git   
 ```
 
 ## Uso
@@ -25,17 +25,17 @@ pip install git+https://github.com/gerickt/text-clean.git
 A continuación se muestra un ejemplo básico de cómo utilizar la librería:
 
 ```python
-import text_clean
+import text_clean as tc
 
-# Crear una instancia del limpiador de texto
-cleaner = text_clean.TextCleaner()
+# Cargar stopwords personalizadas y diccionario de correcciones
+custom_stopwords = tc.load_stopwords('ruta/a/custom_stopwords.txt')
+corrections_dict = tc.load_corrections('ruta/a/corrections.json')
 
-# Limpiar un texto de ejemplo
-text = "¡Hola! Este es un ejemplo de texto en español."
-clean_text = cleaner.clean(text)
+# Combinar stopwords personalizadas con las por defecto
+stopwords_set = tc.default_stopwords.union(custom_stopwords)
 
-print(clean_text)
-# Output: "hola ejemplo texto español"
+# Asumiendo que 'df' es tu DataFrame y 'title' la columna de texto a limpiar
+df = tc.process_text_column(df, 'title', corrections_dict, stopwords_set)
 ```
 
 ## Licencia
