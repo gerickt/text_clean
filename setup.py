@@ -4,15 +4,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="text_clean",  # Reemplaza con el nombre de tu librería
-    version="0.1.0",  # Inicia con una versión y actualízala con cada cambio
+    name="text_clean",
+    version="0.1.0",
     author="Gerick Toro",
     author_email="gerickt@gmail.com",
     description="Librería para limpieza de texto en español.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/gerickt/text-clean",  # URL de tu repositorio
-    packages=find_packages(),
+    url="https://github.com/gerickt/text_clean",
+    packages=["text_clean"],  # Asegúrate de incluir tu paquete aquí
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -23,6 +23,6 @@ setup(
         "unidecode",
         "nltk",
         "spacy",
-    ],  # Agrega todas las dependencias necesarias
+    ],
     python_requires=">=3.6",
 )
