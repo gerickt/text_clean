@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import html
 import nltk
 from nltk.corpus import stopwords
+import json
 import spacy
 
 # Descargar el modelo de spaCy
