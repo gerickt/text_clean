@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="text_clean",
-    version="0.1.5",
+    version="0.1.6",
     author="Gerick Toro",
     author_email="gerickt@gmail.com",
     description="Librería para limpieza de texto en español.",
@@ -23,6 +23,7 @@ setup(
         "unidecode",
         "nltk",
         "spacy",
+        "pandas",
     ],
     python_requires=">=3.6",
 )

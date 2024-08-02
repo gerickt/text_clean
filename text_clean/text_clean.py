@@ -92,6 +92,7 @@ def process_text_column(data, column_name, corrections_dict, stopwords_set):
         x, corrections_dict, stopwords_set) if isinstance(x, str) else x)
     return data
 
+
 def remove_punctuation(text):
     if not isinstance(text, str):
         return text

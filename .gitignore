@@ -1,0 +1,26 @@
+# Archivos y directorios generados por Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Directorio de entorno virtual
+.venv/
+
+# Dependencias instaladas por pip
+build/
+*.egg-info/
+
+# Archivo de registro de errores
+error.log
+
+# Archivos de configuración local
+config.ini
+
+# Archivos de compilación
+*.o
+*.so
+*.pyd
+
+# Archivos de respaldo
+*~
+*.bak
