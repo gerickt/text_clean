@@ -6,7 +6,7 @@ import nltk
 from nltk.corpus import stopwords
 import json
 import spacy
-import string
+
 
 # Descargar el modelo de spaCy
 try:
@@ -95,4 +95,5 @@ def process_text_column(data, column_name, corrections_dict, stopwords_set):
 def remove_punctuation(text):
     if not isinstance(text, str):
         return text
-    return text.translate(str.maketrans('', '', string.punctuation))
+    # Elimina todos los caracteres que no sean letras, números o espacios
+    return re.sub(r'[^\w\s]', '', text)
