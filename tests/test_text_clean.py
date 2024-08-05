@@ -26,6 +26,13 @@ class TestTextClean(unittest.TestCase):
 
     def test_remove_urls(self):
         self.assertEqual(remove_urls('Visita https://example.com'), 'Visita ')
+        self.assertEqual(remove_urls('Visita www.example.com'), 'Visita ')
+        self.assertEqual(remove_urls('Visita http://example.com'), 'Visita ')
+        self.assertEqual(remove_urls(
+            'Visita http://www.example.com'), 'Visita ')
+        self.assertEqual(remove_urls('Visita example.com'), 'Visita ')
+        self.assertEqual(remove_urls(
+            'Visita http://sub.example.com'), 'Visita ')
 
     def test_remove_punctuation(self):
         self.assertEqual(remove_punctuation('Hola, mundo!'), 'Hola mundo')

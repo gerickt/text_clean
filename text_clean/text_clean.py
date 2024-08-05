@@ -6,6 +6,7 @@ import nltk
 from nltk.corpus import stopwords
 import json
 import spacy
+import emoji
 
 # Descargar el modelo de spaCy
 try:
@@ -57,7 +58,9 @@ def clean_text(text, corrections_dict=None, stopwords_set=None, clean_type='all'
     urls, emojis, numbers = [], [], []
 
     if clean_type in ['all', 'url']:
-        urls = extract_elements(text, r'(https?://[^\s]+)')
+        urls = extract_elements(
+            text, r'\b((https?|ftp):\/\/[-\w]+(\.\w[-\w]*)+|www\.[-\w]+(\.\w[-\w]*)+|[-\w]+(\.\w[-\w]*)+)\S*')
+        urls = [url[0] for url in urls]  # Extraer solo la URL completa
         text = remove_urls(text)
 
     if clean_type in ['all', 'html']:
@@ -72,9 +75,8 @@ def clean_text(text, corrections_dict=None, stopwords_set=None, clean_type='all'
         text = re.sub(r'\d+', '', text)  # Elimina números
 
     if clean_type in ['all', 'emoji']:
-        emojis = extract_elements(
-            text, r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF]')
-        text = re.sub(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF]', '', text)
+        emojis = [char for char in text if emoji.is_emoji(char)]
+        text = ''.join([char for char in text if not emoji.is_emoji(char)])
         # Elimina signos de exclamación e interrogación
         text = re.sub(r'[!¡?¿]', '', text)
 
@@ -106,7 +108,7 @@ def clean_html_entities(text):
 def remove_urls(text):
     if not isinstance(text, str):
         return text
-    return re.sub(r'(https?://[^\s]+)', '', text, flags=re.MULTILINE)
+    return re.sub(r'\b((https?|ftp):\/\/[-\w]+(\.\w[-\w]*)+|www\.[-\w]+(\.\w[-\w]*)+|[-\w]+(\.\w[-\w]*)+)\S*', '', text, flags=re.MULTILINE)
 
 
 def lemmatize_text(text):
