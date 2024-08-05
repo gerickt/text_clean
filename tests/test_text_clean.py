@@ -35,20 +35,51 @@ class TestTextClean(unittest.TestCase):
         self.assertEqual(apply_corrections(
             'holaa mundo', corrections_dict), 'hola mundo')
 
-    def test_clean_text(self):
+    def test_clean_text_all(self):
         corrections_dict = {'hola': ['holaa', 'holaaa']}
         text = 'holaa mundo! Visita https://example.com'
-        expected = 'hola mundo visitar'
-        self.assertEqual(clean_text(text, corrections_dict,
-                         default_stopwords), expected)
+        expected_clean = 'hola mundo visitar'
+        clean, urls, emojis, numbers = clean_text(
+            text, corrections_dict, default_stopwords, 'all')
+        self.assertEqual(clean, expected_clean)
+        self.assertEqual(urls, ['https://example.com'])
+        self.assertEqual(emojis, [])
+        self.assertEqual(numbers, [])
+
+    def test_clean_text_url(self):
+        text = 'Visita https://example.com para más información'
+        expected_clean = 'visita informacion'
+        clean, urls, emojis, numbers = clean_text(
+            text, None, default_stopwords, 'url')
+        self.assertEqual(clean, expected_clean)
+        self.assertEqual(urls, ['https://example.com'])
+
+    def test_clean_text_number(self):
+        text = 'Tengo 2 manzanas y 3 peras'
+        expected_clean = 'tener manzana pera'
+        clean, urls, emojis, numbers = clean_text(
+            text, None, default_stopwords, 'number')
+        self.assertEqual(clean, expected_clean)
+        self.assertEqual(numbers, ['2', '3'])
+
+    def test_clean_text_emoji(self):
+        text = '¡Hola! 😊 ¿Cómo estás?'
+        expected_clean = 'hola'
+        clean, urls, emojis, numbers = clean_text(
+            text, None, default_stopwords, 'emoji')
+        self.assertEqual(clean, expected_clean)
+        self.assertEqual(emojis, ['😊'])
 
     def test_process_text_column(self):
         data = pd.DataFrame(
             {'text': ['holaa mundo! Visita https://example.com']})
         corrections_dict = {'hola': ['holaa', 'holaaa']}
         result = process_text_column(
-            data, 'text', corrections_dict, default_stopwords)
+            data, 'text', corrections_dict, default_stopwords, 'all')
         self.assertEqual(result['Text_Clean'][0], 'hola mundo visitar')
+        self.assertEqual(result['Text_URL'][0], ['https://example.com'])
+        self.assertEqual(result['Text_Emojis'][0], [])
+        self.assertEqual(result['Text_Numbers'][0], [])
 
     def test_load_stopwords(self):
         stopwords = load_stopwords('tests/test_stopwords.txt')
