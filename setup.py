@@ -1,3 +1,4 @@
+# setup.py
 from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -5,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="text_clean",
-    version="0.1.6",
+    version="0.1.7",
     author="Gerick Toro",
     author_email="gerickt@gmail.com",
     description="Librería para limpieza de texto en español.",

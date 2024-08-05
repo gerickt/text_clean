@@ -7,7 +7,6 @@ from nltk.corpus import stopwords
 import json
 import spacy
 
-
 # Descargar el modelo de spaCy
 try:
     nlp = spacy.load("es_core_news_lg")
@@ -33,37 +32,57 @@ def load_stopwords(file_path):
 
 
 def load_corrections(file_path):
-    import json
     with open(file_path, 'r', encoding='utf-8') as file:
         corrections_dict = json.load(file)
     return corrections_dict
 
 
 def apply_corrections(text, corrections_dict):
-    for correct_value, variations in corrections_dict.items():
-        for variation in variations:
-            text = re.sub(r'\b{}\b'.format(
-                re.escape(variation.lower())), correct_value.lower(), text)
+    if corrections_dict:
+        for correct_value, variations in corrections_dict.items():
+            for variation in variations:
+                text = re.sub(r'\b{}\b'.format(
+                    re.escape(variation.lower())), correct_value.lower(), text)
     return text
 
 
-def clean_text(text, corrections_dict, stopwords_set):
+def extract_elements(text, pattern):
+    return re.findall(pattern, text)
+
+
+def clean_text(text, corrections_dict=None, stopwords_set=None, clean_type='all'):
     if not isinstance(text, str):
         return text
-    text = remove_urls(text)
-    text = remove_html_tags(text)
-    text = clean_html_entities(text)
-    text = remove_punctuation(text)  # Añadido aquí
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'\d+', '', text)  # Elimina números
-    text = text.lower()
+
+    if clean_type in ['all', 'url']:
+        urls = extract_elements(text, r'(https?://|www\.)\S+')
+        text = remove_urls(text)
+
+    if clean_type in ['all', 'html']:
+        text = remove_html_tags(text)
+        text = clean_html_entities(text)
+
+    if clean_type in ['all', 'symbol']:
+        text = remove_punctuation(text)
+
+    if clean_type in ['all', 'number']:
+        numbers = extract_elements(text, r'\d+')
+        text = re.sub(r'\d+', '', text)  # Elimina números
+
+    if clean_type in ['all', 'emoji']:
+        emojis = extract_elements(text, r'[^\w\s,]')
+        text = re.sub(r'[^\w\s,]', '', text)  # Elimina emojis
+
+    text = re.sub(r'\s+', ' ', text).strip().lower()
     text = apply_corrections(text, corrections_dict)
     text = lemmatize_text(text)
     text = unidecode(text)
 
     words = text.split()
     filtered_words = [word for word in words if word not in stopwords_set]
-    return ' '.join(filtered_words)
+    clean_text = ' '.join(filtered_words)
+
+    return clean_text, urls, emojis, numbers
 
 
 def remove_html_tags(text):
@@ -87,14 +106,15 @@ def lemmatize_text(text):
     return " ".join([token.lemma_ for token in doc])
 
 
-def process_text_column(data, column_name, corrections_dict, stopwords_set):
-    data['Text_Clean'] = data[column_name].apply(lambda x: clean_text(
-        x, corrections_dict, stopwords_set) if isinstance(x, str) else x)
+def process_text_column(data, column_name, corrections_dict=None, stopwords_set=None, clean_type='all'):
+    results = data[column_name].apply(lambda x: clean_text(
+        x, corrections_dict, stopwords_set, clean_type) if isinstance(x, str) else (x, [], [], []))
+    data['Text_Clean'], data['Text_URL'], data['Text_Emojis'], data['Text_Numbers'] = zip(
+        *results)
     return data
 
 
 def remove_punctuation(text):
     if not isinstance(text, str):
         return text
-    # Elimina todos los caracteres que no sean letras, números o espacios
     return re.sub(r'[^\w\s]', '', text)
