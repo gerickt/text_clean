@@ -1,3 +1,4 @@
+# text_clean/text_clean.py
 import re
 from unidecode import unidecode
 from bs4 import BeautifulSoup
@@ -7,6 +8,7 @@ from nltk.corpus import stopwords
 import json
 import spacy
 import emoji
+from multiprocessing import Pool, cpu_count
 
 # Descargar el modelo de spaCy
 try:
@@ -117,10 +119,11 @@ def lemmatize_text(text):
 
 
 def process_text_column(data, column_name, corrections_dict=None, stopwords_set=None, clean_type='all'):
-    results = data[column_name].apply(lambda x: clean_text(
-        x, corrections_dict, stopwords_set, clean_type) if isinstance(x, str) else (x, [], [], []))
-    data['Text_Clean'], data['Text_URL'], data['Text_Emojis'], data['Text_Numbers'] = zip(
-        *results)
+    with Pool(cpu_count()) as pool:
+        results = pool.starmap(
+            process_row, [(row, corrections_dict, stopwords_set, clean_type) for row in data[column_name]]
+        )
+    data['Text_Clean'], data['Text_URL'], data['Text_Emojis'], data['Text_Numbers'] = zip(*results)
     return data
 
 
@@ -128,3 +131,7 @@ def remove_punctuation(text):
     if not isinstance(text, str):
         return text
     return re.sub(r'[^\w\s]', '', text)
+
+def process_row(row, corrections_dict, stopwords_set, clean_type):
+    return clean_text(row, corrections_dict, stopwords_set, clean_type)
+
