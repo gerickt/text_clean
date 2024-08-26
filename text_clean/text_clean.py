@@ -12,10 +12,10 @@ from multiprocessing import Pool, cpu_count
 
 # Descargar el modelo de spaCy
 try:
-    nlp = spacy.load("es_core_news_lg")
+    nlp = spacy.load("es_core_news_md")
 except OSError:
-    spacy.cli.download("es_core_news_lg")
-    nlp = spacy.load("es_core_news_lg")
+    spacy.cli.download("es_core_news_md")
+    nlp = spacy.load("es_core_news_md")
 
 # Descargar las stopwords en español, portugués e inglés
 nltk.download('stopwords')
