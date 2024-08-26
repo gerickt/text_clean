@@ -84,7 +84,7 @@ def clean_text(text, corrections_dict=None, stopwords_set=None, clean_type='all'
 
     text = re.sub(r'\s+', ' ', text).strip().lower()
     text = apply_corrections(text, corrections_dict)
-    text = lemmatize_text(text)
+    #text = lemmatize_text(text)
     text = unidecode(text)
 
     if stopwords_set is not None:
